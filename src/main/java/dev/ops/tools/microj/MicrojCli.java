@@ -1,29 +1,37 @@
 package dev.ops.tools.microj;
 
-import java.io.File;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.ops.tools.microj.cmd.BuildJobCommand;
+import dev.ops.tools.microj.cmd.DeploymentCommand;
+import dev.ops.tools.microj.cmd.ServiceCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.jansi.graalvm.AnsiConsole;
+
+import static picocli.CommandLine.ParameterException;
+import static picocli.CommandLine.Spec;
 
 /**
  * Main application for the Microj CLI.
  */
-@Command(version = "Microj CLI 1.0", mixinStandardHelpOptions = true)
+@Command(name = "microj",
+        subcommands = {BuildJobCommand.class, DeploymentCommand.class, ServiceCommand.class},
+        version = "Microj CLI 1.0",
+        mixinStandardHelpOptions = true,
+        synopsisSubcommandLabel = "[command]",
+        commandListHeading = "%nThese are common Microj CLI commands used in various situations:%n")
 class MicrojCli implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MicrojCli.class);
-
-    @Option(names = {"-f", "--file"}, paramLabel = "JSON_CONFIG", description = "the configuration file", required = false)
-    private File configFile;
+    @Spec
+    private CommandSpec spec;
 
     public static void main(String[] args) {
-        CommandLine.run(new MicrojCli(), args);
+        AnsiConsole.systemInstall();
+        System.exit(new CommandLine(new MicrojCli()).execute(args));
     }
 
     @Override
     public void run() {
-        LOGGER.info("Running Microj CLI ...");
+        throw new ParameterException(spec.commandLine(), "Missing required command");
     }
 }
