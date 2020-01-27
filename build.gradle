@@ -70,3 +70,16 @@ task copyEllipticCurveCrypto(type: Copy) {
 }
 
 graalNativeImage.finalizedBy copyEllipticCurveCrypto
+
+distributions {
+    binary {
+        contents {
+            from("$buildDir/") {
+                include "microj"
+                include "microj.exe"
+                include "libsunec.dylib"
+                include "libsunec.dll"
+            }
+        }
+    }
+}
