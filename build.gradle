@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'groovy'
+}
+
+repositories {
+    jcenter()
+}
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+dependencies {
+    implementation 'info.picocli:picocli:3.9.6'
+
+    compile 'org.slf4j:slf4j-api:1.7.26'
+
+    runtime 'org.slf4j:slf4j-simple:1.7.26'
+    runtime 'info.picocli:picocli-codegen:3.9.6'
+    runtime 'org.fusesource.jansi:jansi:1.18'
+}
+
+application {
+    mainClassName = 'dev.ops.tools.microj.MicrojCli'
+    // applicationDefaultJvmArgs = ['-agentlib:native-image-agent=config-merge-dir=build/resources/main/META-INF/native-image']
+}
+
+task reflectionConfigGenerator(description: 'Generate reflection config', dependsOn: 'assemble', type: JavaExec) {
+    main = 'picocli.codegen.aot.graalvm.ReflectionConfigGenerator'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['dev.ops.tools.microj.MicrojCli', '--output', 'src/main/resources/META-INF/reflect-config.json']
+}
+
+task copyRuntimeLibs(type: Copy) {
+    into "$buildDir/libs"
+    from sourceSets.main.runtimeClasspath
+    include "*.jar"
+}
+
+assemble.finalizedBy copyRuntimeLibs
+
+String getClasspath() {
+    'libs/' + file("$buildDir/libs").list()?.join(':libs/')
+}
+
+task graalNativeImage(description: 'Generate native CLI image', type: Exec) {
+    workingDir "$buildDir"
+    commandLine = [
+            'native-image',
+            '-cp', getClasspath(),
+            '-H:+ReportUnsupportedElementsAtRuntime',
+            '-H:+ReportExceptionStackTraces',
+            '-H:+AddAllCharsets',
+            // '-H:+TraceClassInitialization',
+            '--initialize-at-run-time=org.fusesource.jansi.WindowsAnsiOutputStream',
+            '--no-server',
+            '--enable-http',
+            '--enable-https',
+            'dev.ops.tools.microj.MicrojCli',
+            'microj'
+    ]
+}
+
+task copyEllipticCurveCrypto(type: Copy) {
+    from file(System.getenv("JAVA_HOME") + "/jre/lib/")
+    into "$buildDir"
+    include "libsunec.*"
+}
+
+graalNativeImage.finalizedBy copyEllipticCurveCrypto
