@@ -15,7 +15,7 @@ class MicrojCli implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrojCli.class);
 
-    @Option(names = {"-f", "--file"}, paramLabel = "JSON_CONFIG", description = "the configuration file", required = true)
+    @Option(names = {"-f", "--file"}, paramLabel = "JSON_CONFIG", description = "the configuration file", required = false)
     private File configFile;
 
     public static void main(String[] args) {

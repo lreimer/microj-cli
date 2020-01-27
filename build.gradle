@@ -10,6 +10,7 @@ repositories {
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
+version = "1.0"
 
 dependencies {
     implementation 'info.picocli:picocli:3.9.6'
@@ -29,7 +30,7 @@ application {
 task reflectionConfigGenerator(description: 'Generate reflection config', dependsOn: 'assemble', type: JavaExec) {
     main = 'picocli.codegen.aot.graalvm.ReflectionConfigGenerator'
     classpath = sourceSets.main.runtimeClasspath
-    args = ['dev.ops.tools.microj.MicrojCli', '--output', 'src/main/resources/META-INF/reflect-config.json']
+    args = ['dev.ops.tools.microj.MicrojCli', '--output', 'src/main/resources/META-INF/native-image/reflect-config.json']
 }
 
 task copyRuntimeLibs(type: Copy) {
