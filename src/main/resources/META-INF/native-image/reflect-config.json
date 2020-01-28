@@ -36,7 +36,8 @@
     "allDeclaredMethods" : true,
     "allPublicMethods" : true,
     "fields" : [
-      { "name" : "message" }
+      { "name" : "message" },
+      { "name" : "parameters" }
     ]
   },
   {

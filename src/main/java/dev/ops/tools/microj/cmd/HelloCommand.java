@@ -4,9 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 
-import static picocli.CommandLine.Option;
+import java.util.List;
 
-@Command(name = "hello", description = "Print Hello Microj CLI message")
+import static picocli.CommandLine.Option;
+import static picocli.CommandLine.Parameters;
+
+@Command(name = "hello", description = "Print message")
 public class HelloCommand implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HelloCommand.class);
@@ -14,9 +17,12 @@ public class HelloCommand implements Runnable {
     @Option(names = {"-m", "--message"}, description = "The message", defaultValue = "Hello Microj CLI")
     private String message;
 
+    @Parameters(description = "Arbitrary command line parameters")
+    private List<String> parameters;
+
     @Override
     public void run() {
-        LOGGER.info("{}", message);
+        LOGGER.info("{} - {}", message, parameters);
     }
 
 }
