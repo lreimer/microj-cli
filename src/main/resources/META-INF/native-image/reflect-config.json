@@ -30,6 +30,16 @@
     ]
   },
   {
+    "name" : "dev.ops.tools.microj.cmd.HelloCommand",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "fields" : [
+      { "name" : "message" }
+    ]
+  },
+  {
     "name" : "dev.ops.tools.microj.cmd.ServiceCommand",
     "allDeclaredConstructors" : true,
     "allPublicConstructors" : true,

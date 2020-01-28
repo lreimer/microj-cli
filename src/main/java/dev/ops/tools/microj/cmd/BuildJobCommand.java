@@ -16,7 +16,7 @@ public class BuildJobCommand implements Runnable {
 
     @Override
     public void run() {
-        LOGGER.info("Creating new build job {}", name);
+        LOGGER.info("Creating new Jenkins build job {}", name);
         throw new UnsupportedOperationException("// TODO: Implement me.");
     }
 }

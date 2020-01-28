@@ -2,6 +2,7 @@ package dev.ops.tools.microj;
 
 import dev.ops.tools.microj.cmd.BuildJobCommand;
 import dev.ops.tools.microj.cmd.DeploymentCommand;
+import dev.ops.tools.microj.cmd.HelloCommand;
 import dev.ops.tools.microj.cmd.ServiceCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -15,7 +16,7 @@ import static picocli.CommandLine.Spec;
  * Main application for the Microj CLI.
  */
 @Command(name = "microj",
-        subcommands = {BuildJobCommand.class, DeploymentCommand.class, ServiceCommand.class},
+        subcommands = {ServiceCommand.class, BuildJobCommand.class, DeploymentCommand.class, HelloCommand.class},
         version = "Microj CLI 1.0",
         mixinStandardHelpOptions = true,
         synopsisSubcommandLabel = "command",
