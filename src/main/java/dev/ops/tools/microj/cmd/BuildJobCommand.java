@@ -17,5 +17,6 @@ public class BuildJobCommand implements Runnable {
     @Override
     public void run() {
         LOGGER.info("Creating new build job {}", name);
+        throw new UnsupportedOperationException("// TODO: Implement me.");
     }
 }

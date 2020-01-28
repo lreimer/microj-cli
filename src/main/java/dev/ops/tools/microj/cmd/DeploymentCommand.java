@@ -17,5 +17,6 @@ public class DeploymentCommand implements Runnable {
     @Override
     public void run() {
         LOGGER.info("Making service deployment in namespace {}", namespace);
+        throw new UnsupportedOperationException("// TODO: Implement me.");
     }
 }

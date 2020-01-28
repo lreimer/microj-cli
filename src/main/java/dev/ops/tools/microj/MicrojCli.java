@@ -18,7 +18,7 @@ import static picocli.CommandLine.Spec;
         subcommands = {BuildJobCommand.class, DeploymentCommand.class, ServiceCommand.class},
         version = "Microj CLI 1.0",
         mixinStandardHelpOptions = true,
-        synopsisSubcommandLabel = "[command]",
+        synopsisSubcommandLabel = "command",
         commandListHeading = "%nThese are common Microj CLI commands used in various situations:%n")
 class MicrojCli implements Runnable {
 

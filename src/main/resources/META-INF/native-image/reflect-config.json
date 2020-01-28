@@ -36,7 +36,11 @@
     "allDeclaredMethods" : true,
     "allPublicMethods" : true,
     "fields" : [
-      { "name" : "name" }
+      { "name" : "name" },
+      { "name" : "overwrite" },
+      { "name" : "repository" },
+      { "name" : "spec" },
+      { "name" : "template" }
     ]
   },
   {
