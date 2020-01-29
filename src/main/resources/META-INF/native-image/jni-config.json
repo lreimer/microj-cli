@@ -1,2 +1,21 @@
 [
+{
+  "name":"org.fusesource.jansi.internal.CLibrary",
+  "fields":[
+    {"name":"HAVE_ISATTY"}, 
+    {"name":"HAVE_TTYNAME"}, 
+    {"name":"STDERR_FILENO"}, 
+    {"name":"STDIN_FILENO"}, 
+    {"name":"STDOUT_FILENO"}, 
+    {"name":"TCSADRAIN"}, 
+    {"name":"TCSAFLUSH"}, 
+    {"name":"TCSANOW"}, 
+    {"name":"TIOCGETA"}, 
+    {"name":"TIOCGETD"}, 
+    {"name":"TIOCGWINSZ"}, 
+    {"name":"TIOCSETA"}, 
+    {"name":"TIOCSETD"}, 
+    {"name":"TIOCSWINSZ"}
+  ]
+}
 ]

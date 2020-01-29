@@ -1,5 +1,8 @@
 package dev.ops.tools.microj.cmd;
 
+import com.hubspot.jinjava.Jinjava;
+import com.hubspot.jinjava.JinjavaConfig;
+import com.hubspot.jinjava.loader.FileLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -8,16 +11,17 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Spec;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -47,13 +51,16 @@ public class ServiceCommand implements Runnable {
 
         Path directory = createDirectory();
         Path file = downloadTemplate();
+
         extract(directory, file);
+        renderTemplates(directory);
     }
 
     private void extract(Path directory, Path file) {
         LOGGER.debug("Extracting template file {} into {}", file, directory);
 
         try (JarFile jar = new JarFile(file.toFile())) {
+            // create directories first
             jar.stream().forEach(entry -> {
                 File f = new File(directory.toFile(), entry.getName());
                 if (entry.getName().endsWith("/")) {
@@ -61,6 +68,7 @@ public class ServiceCommand implements Runnable {
                 }
             });
 
+            // then extract the files
             jar.stream().forEach(entry -> {
                 File f = new File(directory.toFile(), entry.getName());
                 if (!entry.getName().endsWith("/")) {
@@ -84,7 +92,7 @@ public class ServiceCommand implements Runnable {
         Path target = Paths.get(name).toAbsolutePath();
 
         try {
-            if (Files.exists(target) && overwrite) {
+            if (target.toFile().exists() && overwrite) {
                 return target;
             }
             return Files.createDirectory(target);
@@ -127,6 +135,45 @@ public class ServiceCommand implements Runnable {
     }
 
     private String getExtension() {
-        return ".jar";
+        String[] coordinates = template.split(":");
+        String[] version = coordinates[2].split("@");
+        return version.length == 2 ? "." + version[1] : ".jar";
+    }
+
+    private Jinjava jinja(Path directory) {
+        Jinjava jinjava = new Jinjava(new JinjavaConfig());
+        try {
+            jinjava.setResourceLocator(new FileLocator(directory.toFile()));
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException("Unable to initialize Jinja.", e);
+        }
+        return jinjava;
+    }
+
+    private void renderTemplates(Path directory) {
+        Jinjava jinja = jinja(directory);
+        try (Stream<Path> pathStream = Files.walk(directory)) {
+            // filter all Freemarker templates
+            pathStream.filter(p -> p.endsWith(".jinja")).forEach(f -> {
+                renderTemplate(jinja, f);
+            });
+        } catch (IOException e) {
+            LOGGER.warn("Error processing templates.", e);
+        }
+    }
+
+    private void renderTemplate(Jinjava jinja, Path file) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("serviceName", name);
+
+        File templateFile = file.toFile();
+        File parsedFile = new File(templateFile.getParent(), templateFile.getName().replace(".jinja", ""));
+
+        try (Writer out = new FileWriter(parsedFile)) {
+            out.write(jinja.render(template, model));
+            Files.delete(templateFile.toPath());
+        } catch (IOException e) {
+            LOGGER.warn("Unable to render template.", e);
+        }
     }
 }
