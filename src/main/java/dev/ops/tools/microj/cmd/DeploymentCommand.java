@@ -6,6 +6,9 @@ import picocli.CommandLine.Command;
 
 import static picocli.CommandLine.Option;
 
+/**
+ * Make a new Deployment for the current microservice project.
+ */
 @Command(name = "deployment", description = "Make a deployment")
 public class DeploymentCommand implements Runnable {
 
