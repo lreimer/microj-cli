@@ -3,6 +3,14 @@ package dev.ops.tools.microj.cmd;
 import com.hubspot.jinjava.Jinjava;
 import com.hubspot.jinjava.JinjavaConfig;
 import com.hubspot.jinjava.loader.FileLocator;
+import dev.ops.tools.microj.MicrojCli;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -12,19 +20,24 @@ import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Spec;
 
 import java.io.*;
+import java.net.Authenticator;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static picocli.CommandLine.ParentCommand;
 
+/**
+ * The subcommand to create and bootstrap a new microservice using a template.
+ */
 @Command(name = "service", description = "Create a new microservice")
 public class ServiceCommand implements Runnable {
 
@@ -33,13 +46,16 @@ public class ServiceCommand implements Runnable {
     @Spec
     private CommandSpec spec;
 
+    @ParentCommand
+    private MicrojCli cli;
+
     @Option(names = {"-n", "--name"}, description = "Service name", required = true)
     private String name;
 
-    @Option(names = {"-r", "--repository"}, description = "Repository URL", defaultValue = "https://repo.maven.apache.org/maven2/")
+    @Option(names = {"-r", "--repository"}, description = "Repository URL", defaultValue = "https://dl.bintray.com/qaware-oss/maven/")
     private String repository;
 
-    @Option(names = {"-t", "--template"}, description = "Template coordinate", required = true)
+    @Option(names = {"-t", "--template"}, description = "Template coordinate")
     private String template;
 
     @Option(names = {"-o", "--overwrite"}, description = "Overwrite service")
@@ -59,32 +75,30 @@ public class ServiceCommand implements Runnable {
     private void extract(Path directory, Path file) {
         LOGGER.debug("Extracting template file {} into {}", file, directory);
 
-        try (JarFile jar = new JarFile(file.toFile())) {
-            // create directories first
-            jar.stream().forEach(entry -> {
-                File f = new File(directory.toFile(), entry.getName());
-                if (entry.getName().endsWith("/")) {
-                    f.mkdirs();
+        try (ArchiveInputStream i = new ArchiveStreamFactory().createArchiveInputStream(getExtension(), new FileInputStream(file.toFile()))) {
+            ArchiveEntry entry;
+            while ((entry = i.getNextEntry()) != null) {
+                if (!i.canReadEntryData(entry)) {
+                    continue;
                 }
-            });
 
-            // then extract the files
-            jar.stream().forEach(entry -> {
                 File f = new File(directory.toFile(), entry.getName());
-                if (!entry.getName().endsWith("/")) {
-                    extractFile(jar, entry, f);
+                if (entry.isDirectory()) {
+                    if (!f.isDirectory() && !f.mkdirs()) {
+                        throw new IOException("Failed to create directory " + f);
+                    }
+                } else {
+                    File parent = f.getParentFile();
+                    if (!parent.isDirectory() && !parent.mkdirs()) {
+                        throw new IOException("Failed to create parent directory " + parent);
+                    }
+                    try (OutputStream o = Files.newOutputStream(f.toPath())) {
+                        IOUtils.copy(i, o);
+                    }
                 }
-            });
-        } catch (IOException e) {
-            throw new IllegalStateException("Invalid template JAR.", e);
-        }
-    }
-
-    private void extractFile(JarFile jar, JarEntry entry, File f) {
-        try {
-            Files.copy(jar.getInputStream(entry), f.toPath(), REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to extract template JAR entry.", e);
+            }
+        } catch (IOException | ArchiveException | IllegalArgumentException e) {
+            throw new IllegalStateException("Unable to extract template " + file.toString(), e);
         }
     }
 
@@ -105,8 +119,10 @@ public class ServiceCommand implements Runnable {
         URL templateUrl = getTemplateURL();
         LOGGER.info("Downloading template file from {}", templateUrl);
 
+        setDefaultAuthenticator();
+
         try (InputStream in = templateUrl.openStream()) {
-            Path tempFile = Files.createTempFile("microj-", getExtension());
+            Path tempFile = Files.createTempFile("microj-", "." + getExtension());
             Files.copy(in, tempFile, REPLACE_EXISTING);
             return tempFile;
         } catch (IOException e) {
@@ -120,8 +136,10 @@ public class ServiceCommand implements Runnable {
         StringBuilder builder = new StringBuilder();
         builder.append(coordinates[0].replace('.', '/')).append('/');
         builder.append(coordinates[1]).append('/');
-        builder.append(coordinates[2]).append('/');
-        builder.append(coordinates[1]).append('-').append(coordinates[2]).append(getExtension());
+        builder.append(getVersion()).append('/');
+        builder.append(coordinates[1]).append('-');
+        builder.append(getVersion());
+        builder.append(".").append(getExtension());
 
         return builder.toString();
     }
@@ -134,10 +152,16 @@ public class ServiceCommand implements Runnable {
         }
     }
 
+    private String getVersion() {
+        String[] coordinates = template.split(":");
+        String[] version = coordinates[2].split("@");
+        return version[0];
+    }
+
     private String getExtension() {
         String[] coordinates = template.split(":");
         String[] version = coordinates[2].split("@");
-        return version.length == 2 ? "." + version[1] : ".jar";
+        return version.length == 2 ? version[1].toLowerCase() : "jar";
     }
 
     private Jinjava jinja(Path directory) {
@@ -153,10 +177,7 @@ public class ServiceCommand implements Runnable {
     private void renderTemplates(Path directory) {
         Jinjava jinja = jinja(directory);
         try (Stream<Path> pathStream = Files.walk(directory)) {
-            // filter all Freemarker templates
-            pathStream.filter(p -> p.endsWith(".jinja")).forEach(f -> {
-                renderTemplate(jinja, f);
-            });
+            pathStream.filter(p -> p.toString().endsWith(".jinja")).forEach(f -> renderTemplate(jinja, f));
         } catch (IOException e) {
             LOGGER.warn("Error processing templates.", e);
         }
@@ -170,10 +191,24 @@ public class ServiceCommand implements Runnable {
         File parsedFile = new File(templateFile.getParent(), templateFile.getName().replace(".jinja", ""));
 
         try (Writer out = new FileWriter(parsedFile)) {
-            out.write(jinja.render(template, model));
+            String jinjaTemplate = FileUtils.readFileToString(templateFile, Charset.defaultCharset());
+            out.write(jinja.render(jinjaTemplate, model));
             Files.delete(templateFile.toPath());
         } catch (IOException e) {
             LOGGER.warn("Unable to render template.", e);
+        }
+    }
+
+    private void setDefaultAuthenticator() {
+        if (StringUtils.isNotEmpty(cli.getUserName())) {
+            Authenticator.setDefault(new RepositoryAuthenticator());
+        }
+    }
+
+    public class RepositoryAuthenticator extends Authenticator {
+        @Override
+        protected PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(cli.getUserName(), cli.getPassword());
         }
     }
 }

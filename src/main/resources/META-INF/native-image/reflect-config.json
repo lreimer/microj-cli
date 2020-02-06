@@ -511,7 +511,11 @@
   "allPublicMethods":true,
   "allDeclaredConstructors":true,
   "allPublicConstructors":true,
-  "fields":[{"name":"spec"}]
+  "fields":[
+    {"name":"password"}, 
+    {"name":"spec"}, 
+    {"name":"userName"}
+  ]
 },
 {
   "name":"dev.ops.tools.microj.cmd.BuildJobCommand",
@@ -520,7 +524,10 @@
   "allPublicMethods":true,
   "allDeclaredConstructors":true,
   "allPublicConstructors":true,
-  "fields":[{"name":"name"}]
+  "fields":[
+    {"name":"cli"}, 
+    {"name":"name"}
+  ]
 },
 {
   "name":"dev.ops.tools.microj.cmd.DeploymentCommand",
@@ -532,7 +539,7 @@
   "fields":[{"name":"namespace"}]
 },
 {
-  "name":"dev.ops.tools.microj.cmd.HelloCommand",
+  "name":"dev.ops.tools.microj.cmd.InfoCommand",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allPublicMethods":true,
@@ -551,6 +558,7 @@
   "allDeclaredConstructors":true,
   "allPublicConstructors":true,
   "fields":[
+    {"name":"cli"}, 
     {"name":"name"}, 
     {"name":"overwrite"}, 
     {"name":"repository"}, 
@@ -658,6 +666,70 @@
 {
   "name":"java.time.ZonedDateTime",
   "methods":[{"name":"parse","parameterTypes":["java.lang.CharSequence"] }]
+},
+{
+  "name":"jinjava.de.odysseus.el.tree.impl.Scanner",
+  "fields":[
+    {"name":"position"}, 
+    {"name":"token"}
+  ],
+  "methods":[{"name":"addKeyToken","parameterTypes":["jinjava.de.odysseus.el.tree.impl.Scanner$Token"] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.AsiExtraField",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.JarMarker",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.ResourceAlignmentExtraField",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.UnicodeCommentExtraField",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.UnicodePathExtraField",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.X000A_NTFS",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.X0014_X509Certificates",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.X0015_CertificateIdForFile",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.X0016_CertificateIdForCentralDirectory",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.X0017_StrongEncryptionHeader",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.X0019_EncryptionRecipientCertificateList",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.X5455_ExtendedTimestamp",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.X7875_NewUnix",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.compress.archivers.zip.Zip64ExtendedInformationExtraField",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"picocli.CommandLine$AutoHelpMixin",

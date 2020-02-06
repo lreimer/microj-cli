@@ -4,6 +4,12 @@ A small CLI to quickly create Java microservices based on pretty generic templat
 This is kind of similar to existing project skaffolding approaches and CLIs such as
 Maven archetypes or the Angular CLI.
 
+## Usage
+
+```bash
+./gradlew run --args 
+```
+
 ## Maintainer
 
 M.-Leander Reimer (@lreimer), <mario-leander.reimer@qaware.de>

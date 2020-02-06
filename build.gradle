@@ -16,6 +16,8 @@ dependencies {
     implementation 'info.picocli:picocli:4.1.4'
     implementation 'info.picocli:picocli-jansi-graalvm:1.1.0'
 
+    compile 'commons-io:commons-io:2.6'
+    compile 'org.apache.commons:commons-compress:1.19'
     compile 'com.hubspot.jinjava:jinjava:2.5.2'
 
     compile 'org.slf4j:slf4j-api:1.7.26'
