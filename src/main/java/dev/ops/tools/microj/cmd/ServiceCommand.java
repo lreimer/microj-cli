@@ -11,6 +11,10 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.InitCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -63,13 +67,60 @@ public class ServiceCommand implements Runnable {
 
     @Override
     public void run() {
-        LOGGER.info("Creating new service {} from template {}", name, template);
-
         Path directory = createDirectory();
-        Path file = downloadTemplate();
+        if (isGitRepositoryUrl()) {
+            LOGGER.info("Creating new service {} from Git repository {}", name, repository);
 
-        extract(directory, file);
+            // clone and export Git repository
+            exportRepository(directory);
+        } else {
+            LOGGER.info("Creating new service {} from template {}", name, template);
+
+            // download and extract the template
+            Path file = downloadTemplate();
+            extract(directory, file);
+        }
+
         renderTemplates(directory);
+        chmodExecutables(directory);
+        initGitRepository(directory);
+
+        LOGGER.info("Successfully created service {}.", name);
+    }
+
+    private void chmodExecutables(Path directory) {
+        File gradlew = new File(directory.toFile(), "gradlew");
+        if (gradlew.exists()) {
+            gradlew.setExecutable(true, false);
+        }
+
+        File mvnw = new File(directory.toFile(), "mvnw");
+        if (mvnw.exists()) {
+            mvnw.setExecutable(true, false);
+        }
+    }
+
+    private void exportRepository(Path directory) {
+        CloneCommand clone = Git.cloneRepository()
+                .setURI(repository)
+                .setDirectory(directory.toFile())
+                .setBranch(null);
+
+        try (Git ignored = clone.call()) {
+            FileUtils.deleteDirectory(new File(directory.toFile(), ".git/"));
+        } catch (GitAPIException | IOException e) {
+            throw new IllegalStateException("Unable to export template Git repository.", e);
+        }
+    }
+
+    private void initGitRepository(Path directory) {
+        InitCommand init = Git.init()
+                .setDirectory(directory.toFile());
+
+        try (Git ignored = init.call()) {
+        } catch (GitAPIException e) {
+            throw new IllegalStateException("Unable to init service Git repository.", e);
+        }
     }
 
     private void extract(Path directory, Path file) {
@@ -142,6 +193,10 @@ public class ServiceCommand implements Runnable {
         builder.append(".").append(getExtension());
 
         return builder.toString();
+    }
+
+    private boolean isGitRepositoryUrl() {
+        return repository.endsWith(".git");
     }
 
     public URL getTemplateURL() {
