@@ -9,12 +9,15 @@ import java.util.List;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.Parameters;
 
-@Command(name = "hello", description = "Print message")
-public class HelloCommand implements Runnable {
+/**
+ * Simple CLI subcommand to print an info and hello message.
+ */
+@Command(name = "info", description = "Print info message")
+public class InfoCommand implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HelloCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InfoCommand.class);
 
-    @Option(names = {"-m", "--message"}, description = "The message", defaultValue = "Hello Microj CLI")
+    @Option(names = {"-m", "--message"}, description = "The message", defaultValue = "Microj CLI")
     private String message;
 
     @Parameters(description = "Arbitrary command line parameters")
