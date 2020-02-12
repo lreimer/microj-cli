@@ -15,6 +15,7 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -104,6 +105,7 @@ public class ServiceCommand implements Runnable {
         CloneCommand clone = Git.cloneRepository()
                 .setURI(repository)
                 .setDirectory(directory.toFile())
+                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(cli.getUserName(), cli.getPassword()))
                 .setBranch(null);
 
         try (Git ignored = clone.call()) {
