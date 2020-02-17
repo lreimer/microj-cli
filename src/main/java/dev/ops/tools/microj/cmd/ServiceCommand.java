@@ -33,11 +33,14 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.apache.commons.lang3.StringUtils.join;
 import static picocli.CommandLine.ParentCommand;
 
 /**
@@ -54,7 +57,7 @@ public class ServiceCommand implements Runnable {
     @ParentCommand
     private MicrojCli cli;
 
-    @Option(names = {"-n", "--name"}, description = "Service name", required = true)
+    @Option(names = {"-n", "--name"}, description = "Service name", required = true, paramLabel = "service-name")
     private String name;
 
     @Option(names = {"-r", "--repository"}, description = "Repository URL", defaultValue = "https://dl.bintray.com/qaware-oss/maven/")
@@ -241,12 +244,10 @@ public class ServiceCommand implements Runnable {
     }
 
     private void renderTemplate(Jinjava jinja, Path file) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("serviceName", name);
-
         File templateFile = file.toFile();
         File parsedFile = new File(templateFile.getParent(), templateFile.getName().replace(".jinja", ""));
 
+        Map<String, Object> model = getTemplateModel();
         try (Writer out = new FileWriter(parsedFile)) {
             String jinjaTemplate = FileUtils.readFileToString(templateFile, Charset.defaultCharset());
             out.write(jinja.render(jinjaTemplate, model));
@@ -254,6 +255,18 @@ public class ServiceCommand implements Runnable {
         } catch (IOException e) {
             LOGGER.warn("Unable to render template.", e);
         }
+    }
+
+    private Map<String, Object> getTemplateModel() {
+        String[] parts = StringUtils.split(name, '-');
+        String[] capitalized = Arrays.stream(parts).map(StringUtils::capitalize).collect(Collectors.toList()).toArray(new String[0]);
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("name", name);
+        model.put("serviceName", parts[0] + join(Arrays.copyOfRange(capitalized, 1, capitalized.length)));
+        model.put("ServiceName", join(capitalized));
+        model.put("Service_Name", join(capitalized, ' '));
+        return model;
     }
 
     private void setDefaultAuthenticator() {

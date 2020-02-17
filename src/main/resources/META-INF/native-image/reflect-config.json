@@ -526,7 +526,12 @@
   "allPublicConstructors":true,
   "fields":[
     {"name":"cli"}, 
-    {"name":"name"}
+    {"name":"config"}, 
+    {"name":"directory"}, 
+    {"name":"folder"}, 
+    {"name":"name"}, 
+    {"name":"serverUri"}, 
+    {"name":"spec"}
   ]
 },
 {
@@ -574,6 +579,13 @@
   "name":"java.lang.Object",
   "allDeclaredFields":true,
   "allDeclaredMethods":true
+},
+{
+  "name":"java.net.URI",
+  "allDeclaredMethods":true,
+  "allPublicMethods":true,
+  "allDeclaredConstructors":true,
+  "allPublicConstructors":true
 },
 {
   "name":"java.nio.file.Files",
@@ -730,6 +742,18 @@
 {
   "name":"org.apache.commons.compress.archivers.zip.Zip64ExtendedInformationExtraField",
   "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.commons.lang3.StringUtils",
+  "methods":[{"name":"capitalize","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"org.eclipse.jgit.lib.CoreConfig$HideDotFiles",
+  "methods":[{"name":"values","parameterTypes":[] }]
+},
+{
+  "name":"org.eclipse.jgit.lib.CoreConfig$LogRefUpdates",
+  "methods":[{"name":"values","parameterTypes":[] }]
 },
 {
   "name":"picocli.CommandLine$AutoHelpMixin",
