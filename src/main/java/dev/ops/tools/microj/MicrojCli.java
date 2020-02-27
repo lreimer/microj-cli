@@ -1,9 +1,9 @@
 package dev.ops.tools.microj;
 
 import dev.ops.tools.microj.cmd.BuildJobCommand;
-import dev.ops.tools.microj.cmd.DeploymentCommand;
 import dev.ops.tools.microj.cmd.InfoCommand;
 import dev.ops.tools.microj.cmd.ServiceCommand;
+import picocli.AutoComplete.GenerateCompletion;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -17,7 +17,7 @@ import static picocli.CommandLine.Spec;
  * Main application for the Microj CLI.
  */
 @Command(name = "microj",
-        subcommands = {ServiceCommand.class, BuildJobCommand.class, DeploymentCommand.class, InfoCommand.class},
+        subcommands = {ServiceCommand.class, BuildJobCommand.class, InfoCommand.class, GenerateCompletion.class},
         version = "Microj CLI 1.0",
         mixinStandardHelpOptions = true,
         synopsisSubcommandLabel = "command",

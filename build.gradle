@@ -38,6 +38,12 @@ application {
     applicationDefaultJvmArgs = ['-agentlib:native-image-agent=config-merge-dir=build/resources/main/META-INF/native-image']
 }
 
+task generateShellCompletion(description: 'Generate shell completion', dependsOn: 'assemble', type: JavaExec) {
+    main = 'picocli.AutoComplete'
+    classpath = sourceSets.main.runtimeClasspath
+    args = ['--force', '--completionScript', 'build/microj_completion.sh', 'dev.ops.tools.microj.MicrojCli']
+}
+
 task reflectionConfigGenerator(description: 'Generate reflection config', dependsOn: 'assemble', type: JavaExec) {
     main = 'picocli.codegen.aot.graalvm.ReflectionConfigGenerator'
     classpath = sourceSets.main.runtimeClasspath
