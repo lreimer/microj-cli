@@ -1,5 +1,10 @@
 .gradle/
 build/
+bin/
+.vscode/
+.settings/
+.project
+.classpath
 
 gradle-app.setting
 .gradletasknamecache

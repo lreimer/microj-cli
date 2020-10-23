@@ -535,15 +535,6 @@
   ]
 },
 {
-  "name":"dev.ops.tools.microj.cmd.DeploymentCommand",
-  "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
-  "allDeclaredConstructors":true,
-  "allPublicConstructors":true,
-  "fields":[{"name":"namespace"}]
-},
-{
   "name":"dev.ops.tools.microj.cmd.InfoCommand",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
