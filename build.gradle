@@ -63,7 +63,7 @@ String getClasspath() {
     'libs/' + file("$buildDir/libs").list()?.join(':libs/')
 }
 
-task graalNativeImage(description: 'Generate native CLI image', type: Exec) {
+task graalNativeImage(description: 'Generate native CLI image', dependsOn: 'build', type: Exec) {
     workingDir "$buildDir"
     commandLine = [
             'native-image',
