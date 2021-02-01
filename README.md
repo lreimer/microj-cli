@@ -1,8 +1,8 @@
 # microj CLI
 
-A small CLI to quickly create Java microservices based on pretty generic templates.
-This is kind of similar to existing project skaffolding approaches and CLIs such as
-Maven archetypes or the Angular CLI.
+A small CLI to quickly create Java service or application projects based on pretty generic templates.
+This is kind of similar to existing project skaffolding approaches and CLIs such as Maven archetypes 
+or the Angular CLI.
 
 ## Usage
 

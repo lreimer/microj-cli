@@ -44,12 +44,12 @@ import static org.apache.commons.lang3.StringUtils.join;
 import static picocli.CommandLine.ParentCommand;
 
 /**
- * The subcommand to create and bootstrap a new microservice using a template.
+ * The subcommand to create and bootstrap a new service or application project from a template.
  */
-@Command(name = "service", description = "Create a new microservice")
-public class ServiceCommand implements Runnable {
+@Command(name = "project", aliases = {"application", "service"}, description = "Create a new service or application project")
+public class ProjectCommand implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectCommand.class);
 
     @Spec
     private CommandSpec spec;
@@ -57,7 +57,7 @@ public class ServiceCommand implements Runnable {
     @ParentCommand
     private MicrojCli cli;
 
-    @Option(names = {"-n", "--name"}, description = "Service name", required = true, paramLabel = "service-name")
+    @Option(names = {"-n", "--name"}, description = "Project name", required = true, paramLabel = "service-name")
     private String name;
 
     @Option(names = {"-r", "--repository"}, description = "Repository URL", defaultValue = "https://dl.bintray.com/qaware-oss/maven/")
@@ -66,19 +66,19 @@ public class ServiceCommand implements Runnable {
     @Option(names = {"-t", "--template"}, description = "Template coordinate")
     private String template;
 
-    @Option(names = {"-o", "--overwrite"}, description = "Overwrite service")
+    @Option(names = {"-o", "--overwrite"}, description = "Overwrite?")
     private boolean overwrite;
 
     @Override
     public void run() {
         Path directory = createDirectory();
         if (isGitRepositoryUrl()) {
-            LOGGER.info("Creating new service {} from Git repository {}", name, repository);
+            LOGGER.info("Creating new project {} from Git repository {}", name, repository);
 
             // clone and export Git repository
             exportRepository(directory);
         } else {
-            LOGGER.info("Creating new service {} from template {}", name, template);
+            LOGGER.info("Creating new project {} from template {}", name, template);
 
             // download and extract the template
             Path file = downloadTemplate();
@@ -89,7 +89,7 @@ public class ServiceCommand implements Runnable {
         chmodExecutables(directory);
         initGitRepository(directory);
 
-        LOGGER.info("Successfully created service {}.", name);
+        LOGGER.info("Successfully created project {}.", name);
     }
 
     private void chmodExecutables(Path directory) {
@@ -123,6 +123,7 @@ public class ServiceCommand implements Runnable {
                 .setDirectory(directory.toFile());
 
         try (Git ignored = init.call()) {
+            LOGGER.debug("Initialized Git repository.");
         } catch (GitAPIException e) {
             throw new IllegalStateException("Unable to init service Git repository.", e);
         }
@@ -263,9 +264,19 @@ public class ServiceCommand implements Runnable {
 
         Map<String, Object> model = new HashMap<>();
         model.put("name", name);
+        
+        model.put("applicationName", parts[0] + join(Arrays.copyOfRange(capitalized, 1, capitalized.length)));
+        model.put("ApplicationName", join(capitalized));
+        model.put("Application_Name", join(capitalized, ' '));
+
         model.put("serviceName", parts[0] + join(Arrays.copyOfRange(capitalized, 1, capitalized.length)));
         model.put("ServiceName", join(capitalized));
         model.put("Service_Name", join(capitalized, ' '));
+
+        model.put("projectName", parts[0] + join(Arrays.copyOfRange(capitalized, 1, capitalized.length)));
+        model.put("ProjectName", join(capitalized));
+        model.put("Project_Name", join(capitalized, ' '));
+
         return model;
     }
 

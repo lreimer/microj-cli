@@ -17,7 +17,7 @@ public class InfoCommand implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InfoCommand.class);
 
-    @Option(names = {"-m", "--message"}, description = "The message", defaultValue = "Easily bootstrap microservice with Microj CLI")
+    @Option(names = {"-m", "--message"}, description = "The message", defaultValue = "Easily bootstrap Java projects with Microj CLI")
     private String message;
 
     @Parameters(description = "Arbitrary command line parameters")
