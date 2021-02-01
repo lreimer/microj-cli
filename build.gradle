@@ -13,25 +13,25 @@ sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
 dependencies {
-    implementation 'info.picocli:picocli:4.5.2'
+    implementation 'info.picocli:picocli:4.6.1'
     implementation 'info.picocli:picocli-jansi-graalvm:1.2.0'
 
-    compile 'commons-io:commons-io:2.6'
-    compile 'org.apache.commons:commons-compress:1.19'
-    compile 'com.hubspot.jinjava:jinjava:2.5.2'
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'org.apache.commons:commons-compress:1.19'
+    implementation 'com.hubspot.jinjava:jinjava:2.5.2'
 
-    compile 'org.eclipse.jgit:org.eclipse.jgit:5.6.0.201912101111-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.6.0.201912101111-r'
 
-    compile 'com.offbytwo.jenkins:jenkins-client:0.3.8'
-    compile 'org.glassfish:jakarta.json:1.1.6'
+    implementation 'com.offbytwo.jenkins:jenkins-client:0.3.8'
+    implementation 'org.glassfish:jakarta.json:1.1.6'
 
-    compile 'org.slf4j:slf4j-api:1.7.26'
-    runtime 'org.slf4j:slf4j-simple:1.7.26'
-    runtime 'org.slf4j:log4j-over-slf4j:1.7.26'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    runtimeOnly 'org.slf4j:slf4j-simple:1.7.30'
+    runtimeOnly 'org.slf4j:log4j-over-slf4j:1.7.30'
 
-    // annotationProcessor 'info.picocli:picocli-codegen:4.1.4'
-    runtime 'info.picocli:picocli-codegen:4.1.4'
-    runtime 'info.picocli:picocli-shell-jline3:4.1.4'
+    // annotationProcessor 'info.picocli:picocli-codegen:4.6.1'
+    runtimeOnly 'info.picocli:picocli-codegen:4.6.1'
+    runtimeOnly 'info.picocli:picocli-shell-jline3:4.6.1'
 }
 
 application {
@@ -71,11 +71,12 @@ task graalNativeImage(description: 'Generate native CLI image', type: Exec) {
             '-H:+ReportUnsupportedElementsAtRuntime',
             '-H:+ReportExceptionStackTraces',
             '-H:+AddAllCharsets',
-            '-H:+TraceClassInitialization',
-            '--initialize-at-build-time=org.eclipse.jgit,org.eclipse.jgit.lib,org.bouncycastle.jce.provider,org.bouncycastle.pqc.asn1,org.bouncycastle.jcajce.provider.asymmetric.edec,org.bouncycastle.asn1.edec,org.bouncycastle.util,org.bouncycastle.asn1.x9,org.slf4j.simple.SimpleLogger,org.slf4j.LoggerFactory',
-            '--initialize-at-run-time=org.fusesource.jansi.WindowsAnsiOutputStream,org.slf4j.impl.StaticLoggerBinder',
+            // '-H:+PrintClassInitialization',
+            '--initialize-at-build-time=org.eclipse.jgit.diff.DiffEntry,org.eclipse.jgit.diff.RenameDetector,org.eclipse.jgit.diff.DiffFormatter,org.eclipse.jgit.lib.ObjectId,org.slf4j.LoggerFactory,org.eclipse.jgit.ignore.internal.Strings,org.eclipse.jgit.lib.Constants,org.eclipse.jgit.treewalk.WorkingTreeIterator,org.slf4j.impl.StaticLoggerBinder,org.eclipse.jgit.internal.storage.pack.PackWriter,org.eclipse.jgit.attributes.AttributesHandler,org.eclipse.jgit.util.RawParseUtils,org.eclipse.jgit.transport.Transport,org.slf4j.impl.SimpleLogger,org.eclipse.jgit.transport.TransportGitSsh,org.eclipse.jgit.transport.HttpAuthMethod$Type,org.eclipse.jgit.transport.TransportBundleFile,org.eclipse.jgit.transport.TransferConfig,org.eclipse.jgit.transport.TransportHttp',
+            '--initialize-at-run-time=org.fusesource.jansi.WindowsAnsiOutputStream',
             '--no-server',
-            '--force-fallback',
+            '--no-fallback',
+            // '--force-fallback',
             '--enable-http',
             '--enable-https',
             'dev.ops.tools.microj.MicrojCli',
