@@ -547,7 +547,7 @@
   ]
 },
 {
-  "name":"dev.ops.tools.microj.cmd.ServiceCommand",
+  "name":"dev.ops.tools.microj.cmd.ProjectCommand",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allPublicMethods":true,
@@ -756,6 +756,17 @@
   "fields":[
     {"name":"helpRequested"}, 
     {"name":"versionRequested"}
+  ]
+},
+{
+  "name":"picocli.AutoComplete$GenerateCompletion",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allPublicMethods":true,
+  "allDeclaredConstructors":true,
+  "allPublicConstructors":true,
+  "fields":[
+    {"name":"spec"}
   ]
 }
 ]
